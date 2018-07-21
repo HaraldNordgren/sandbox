@@ -7,11 +7,12 @@ import requests
 TOKEN = sys.argv[1]
 HEADERS = {'Authorization': 'token {}'.format(TOKEN)}
 
+start_date = "2017-05-16"
+
 with requests.Session() as s:
     s.headers.update(HEADERS)
 
     counter = {}
-
     users = [
         "alesr",
         "ashrafansari",
@@ -28,29 +29,28 @@ with requests.Session() as s:
             "user:betalo-sweden",
             "is:pr",
             "is:merged",
-            "created:>2017-05-16",
+            "created:>" + start_date,
         ]
         u = 'https://api.github.com/search/issues?q=' + "+".join(keys)
-        
         resp = s.get(u)
         if resp.status_code != 200:
             sys.exit(1)
 
         result = resp.json()
-        #print(result["total_count"])
-        #print(result["items"][0]["user"]["login"])
-
         counter[username] = result["total_count"]
 
-    total = sum(counter.values())
+    total_prs = sum(counter.values())
     ratios = {}
     for username, prs in counter.items():
-        #ratios[username] = "{0:.0%}".format(prs / total)
-        ratios[username] = prs / total
+        ratios[username] = prs / total_prs
 
     sorted_ratios = sorted(ratios.items(), reverse=True, key=lambda kv: kv[1])
     result = []
-    for v in sorted_ratios:
-        k, vv = v
-        result.append((k, "{0:.0%}".format(vv)))
+    for ratio_tuple in sorted_ratios:
+        username, ratio = ratio_tuple
+        result.append((username, "{0:.0%}".format(ratio)))
+
+    print()
+    print("Merged Betalo pull requests since " + start_date)
     pprint.pprint(result)
+

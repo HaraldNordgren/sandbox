@@ -24,33 +24,30 @@ with requests.Session() as s:
     ]
 
     for username in users:
-        keys = [
+        u = 'https://api.github.com/search/issues?q=' + "+".join([
             "author:" + username,
             "user:betalo-sweden",
             "is:pr",
             "is:merged",
             "created:>" + start_date,
-        ]
-        u = 'https://api.github.com/search/issues?q=' + "+".join(keys)
+        ])
         resp = s.get(u)
         if resp.status_code != 200:
             sys.exit(1)
 
-        result = resp.json()
-        counter[username] = result["total_count"]
+        json_resp = resp.json()
+        counter[username] = json_resp["total_count"]
 
     total_prs = sum(counter.values())
-    ratios = {}
-    for username, prs in counter.items():
-        ratios[username] = prs / total_prs
-
+    ratios = {username: prs/total_prs for username, prs in counter.items()}
     sorted_ratios = sorted(ratios.items(), reverse=True, key=lambda kv: kv[1])
+    
     result = []
     for ratio_tuple in sorted_ratios:
         username, ratio = ratio_tuple
         result.append((username, "{0:.0%}".format(ratio)))
 
     print()
-    print("Merged Betalo pull requests since " + start_date)
+    print("Merged Betalo pull requests since {0}:".format(start_date))
     pprint.pprint(result)
 

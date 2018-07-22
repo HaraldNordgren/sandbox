@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
+import os
 import pprint
 import requests
 import sys
 
 from ratios import Ratio
 
-
-TOKEN = sys.argv[1]
+TOKEN = os.environ['GITHUB_OAUTH_TOKEN']
 HEADERS = {'Authorization': 'token {}'.format(TOKEN)}
 
 start_date = "2017-05-16"

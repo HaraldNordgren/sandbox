@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os
 import pprint
 import requests
 import sys
@@ -8,8 +9,8 @@ from ratios import Ratio
 from requests.auth import HTTPBasicAuth
 
 
-USERNAME = sys.argv[1]
-PASSWORD = sys.argv[2]
+USERNAME = os.environ['JIRA_USERNAME']
+PASSWORD = os.environ['JIRA_PASSWORD']
 
 start_date = "2017-05-16"
 

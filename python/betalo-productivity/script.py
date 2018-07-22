@@ -23,23 +23,21 @@ users = [
     "rgpfc",
 ]
 
-with requests.Session() as s:
-    s.headers.update(HEADERS)
+for username in users:
+    u = 'https://api.github.com/search/issues?q=' + "+".join([
+        "user:betalo-sweden",
+        "is:pr",
+        "is:merged",
+        "created:>" + start_date,
+        "author:" + username,
+    ])
+    resp = requests.get(u, headers=HEADERS)
+    if resp.status_code != 200:
+        print(resp)
+        sys.exit(1)
 
-    for username in users:
-        u = 'https://api.github.com/search/issues?q=' + "+".join([
-            "author:" + username,
-            "user:betalo-sweden",
-            "is:pr",
-            "is:merged",
-            "created:>" + start_date,
-        ])
-        resp = s.get(u)
-        if resp.status_code != 200:
-            sys.exit(1)
-
-        json_resp = resp.json()
-        counter[username] = json_resp["total_count"]
+    json_resp = resp.json()
+    counter[username] = json_resp["total_count"]
 
 result = Ratio.calculate_ratios(counter)
 print()

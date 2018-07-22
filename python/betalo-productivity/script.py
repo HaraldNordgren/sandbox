@@ -1,28 +1,30 @@
 #!/usr/bin/env python3
 
-import sys
 import pprint
 import requests
+import sys
+
 from ratios import Ratio
+
 
 TOKEN = sys.argv[1]
 HEADERS = {'Authorization': 'token {}'.format(TOKEN)}
 
 start_date = "2017-05-16"
 
+counter = {}
+users = [
+    "alesr",
+    "ashrafansari",
+    "djui",
+    "frozendragon498",
+    "haraldnordgren",
+    "jeespers",
+    "rgpfc",
+]
+
 with requests.Session() as s:
     s.headers.update(HEADERS)
-
-    counter = {}
-    users = [
-        "alesr",
-        "ashrafansari",
-        "djui",
-        "frozendragon498",
-        "haraldnordgren",
-        "jeespers",
-        "rgpfc",
-    ]
 
     for username in users:
         u = 'https://api.github.com/search/issues?q=' + "+".join([
@@ -39,8 +41,8 @@ with requests.Session() as s:
         json_resp = resp.json()
         counter[username] = json_resp["total_count"]
 
-    result = Ratio.calculate_ratios(counter)
-    print()
-    print("Merged Betalo pull requests since {0}:".format(start_date))
-    pprint.pprint(result)
+result = Ratio.calculate_ratios(counter)
+print()
+print("Merged Betalo pull requests since {0}:".format(start_date))
+pprint.pprint(result)
 

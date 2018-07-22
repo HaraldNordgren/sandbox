@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 
-import sys
 import pprint
 import requests
-from requests.auth import HTTPBasicAuth
+import sys
+
 from ratios import Ratio
+from requests.auth import HTTPBasicAuth
+
 
 USERNAME = sys.argv[1]
 PASSWORD = sys.argv[2]
@@ -23,7 +25,7 @@ users = [
 ]
 
 for username in users:
-    jql = "status=done AND createdDate>=\"{0}\" AND assignee = {1}".format(
+    jql = "status=done AND resolved>=\"{0}\" AND assignee={1}".format(
         start_date,
         username,
     )

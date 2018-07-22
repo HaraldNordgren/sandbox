@@ -4,6 +4,7 @@ import sys
 import pprint
 import requests
 from requests.auth import HTTPBasicAuth
+from ratios import Ratio
 
 USERNAME = sys.argv[1]
 PASSWORD = sys.argv[2]
@@ -43,15 +44,7 @@ for username in users:
     json_resp = resp.json()
     counter[username] = json_resp["total"]
 
-total_prs = sum(counter.values())
-ratios = {username: prs/total_prs for username, prs in counter.items()}
-sorted_ratios = sorted(ratios.items(), reverse=True, key=lambda kv: kv[1])
-
-result = []
-for ratio_tuple in sorted_ratios:
-    username, ratio = ratio_tuple
-    result.append((username, "{0:.0%}".format(ratio)))
-
+result = Ratio.calculate_ratios(counter)
 print()
 print("Completed JIRA tasks since {0}:".format(start_date))
 pprint.pprint(result)

@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+def redact(username):
+    if username != "harald.nordgren" and username != "haraldnordgren":
+        return "REDACTED"
+    return username
+
 class Ratio:
     def calculate_ratios(counter):
         total_prs = sum(counter.values())
@@ -20,7 +25,7 @@ class Ratio:
         result = []
         for ratio_tuple in sorted_ratios:
             username, ratio = ratio_tuple
-            result.append((username, "{0} ({1:.1%})".format(
+            result.append((redact(username), "{0} ({1:.1%})".format(
                 ratio["total"],
                 ratio["ratio"],
             )))

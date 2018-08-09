@@ -7,7 +7,16 @@ import sys
 
 from ratios import Ratio
 
-TOKEN = os.environ['GITHUB_OAUTH_TOKEN']
+TOKEN = os.environ.get('GITHUB_OAUTH_TOKEN', "")
+
+if TOKEN == "":
+    print("Please set environment variable GITHUB_OAUTH_TOKEN.")
+    print()
+    print("Go to 'https://github.com/settings/tokens' and generate a token with 'repo' accces ('Full control of private repositories') then",)
+    print()
+    print("    export GITHUB_OAUTH_TOKEN='token'")
+    sys.exit(1)
+
 HEADERS = {'Authorization': 'token {}'.format(TOKEN)}
 
 start_date = "2017-05-16"

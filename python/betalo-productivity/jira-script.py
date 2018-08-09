@@ -9,8 +9,14 @@ from ratios import Ratio
 from requests.auth import HTTPBasicAuth
 
 
-USERNAME = os.environ['JIRA_USERNAME']
-PASSWORD = os.environ['JIRA_PASSWORD']
+USERNAME = os.environ.get('JIRA_USERNAME', "")
+PASSWORD = os.environ.get('JIRA_PASSWORD', "")
+
+if USERNAME == "" or PASSWORD == "":
+    print("Please set environment variables JIRA_USERNAME and JIRA_PASSWORD:")
+    print()
+    print("    export JIRA_USERNAME='some.user@betalo.se' JIRA_PASSWORD='some_password'")
+    sys.exit(1)
 
 start_date = "2017-05-16"
 

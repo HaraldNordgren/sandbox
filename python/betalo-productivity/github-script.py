@@ -1,3 +1,14 @@
+A. Commit message:
+Add timeout to HTTP requests in user fetching script
+
+B. Change summary:
+Added a `timeout` parameter to the HTTP GET requests in order to prevent potential Denial of Service (DoS) caused by uncontrolled resource consumption when connections are left open indefinitely.
+
+C. Compatibility Risk:
+Low
+
+D. Fixed Code:
+```python
 #!/usr/bin/env python3
 
 import os
@@ -40,7 +51,7 @@ for username in users:
         "created:>" + start_date,
         "author:" + username,
     ])
-    resp = requests.get(u, headers=HEADERS)
+    resp = requests.get(u, headers=HEADERS, timeout=10)
     if resp.status_code != 200:
         print(resp)
         sys.exit(1)
@@ -52,4 +63,4 @@ result = Ratio.calculate_ratios(counter)
 print()
 print("Merged Betalo pull requests since {0}:".format(start_date))
 pprint.pprint(result)
-
+```

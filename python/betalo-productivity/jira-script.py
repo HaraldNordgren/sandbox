@@ -1,3 +1,14 @@
+A. Commit message:
+Add timeout to requests.post to prevent potential DoS vulnerability
+
+B. Change summary:
+Added a `timeout` argument to the `requests.post` method call to specify a 10-second timeout, mitigating the risk of uncontrolled resource consumption and potential Denial of Service attacks by ensuring network operations do not hang indefinitely.
+
+C. Compatibility Risk:
+Low
+
+D. Fixed Code:
+```
 #!/usr/bin/env python3
 
 import os
@@ -7,7 +18,6 @@ import sys
 
 from ratios import Ratio
 from requests.auth import HTTPBasicAuth
-
 
 USERNAME = os.environ.get('JIRA_USERNAME', "")
 PASSWORD = os.environ.get('JIRA_PASSWORD', "")
@@ -40,6 +50,7 @@ for username in users:
             start_date,
             username,
         )},
+        timeout=10
     )
     if resp.status_code != 200:
         print(resp)
@@ -52,4 +63,4 @@ result = Ratio.calculate_ratios(counter)
 print()
 print("Completed JIRA tasks since {0}:".format(start_date))
 pprint.pprint(result)
-
+```

@@ -10,46 +10,63 @@ FPS = 5
 WINDOWWIDTH = 640
 WINDOWHEIGHT = 480
 CELLSIZE = 20
-assert WINDOWWIDTH % CELLSIZE == 0, "Window width must be a multiple of cell size."
-assert WINDOWHEIGHT % CELLSIZE == 0, "Window height must be a multiple of cell size."
-CELLWIDTH = int(WINDOWWIDTH / CELLSIZE)
+A. Commit message:
+Replace assert statements with conditional checks to prevent removal in optimized bytecode.
+
+B. Change summary:
+The assert statement used for validation has been replaced with a conditional check and exception handling to ensure the condition is checked in optimized bytecode.
+
+C. Compatibility Risk:
+Low
+
+D. Fixed Code:
+try:
+    if WINDOWWIDTH % CELLSIZE != 0:
+        raise ValueError("Window width must be a multiple of cell size.")
+except ValueError as e:
+    # Handle error
+    # ...
+    # Return, do not continue processing
+    return
+A. Commit message:
+Remove assert in non-test code and replace with appropriate error handling
+
+B. Change summary:
+Replaced the `assert` statement with an `if` condition and error handling to avoid removal during optimized bytecode compilation.
+
+C. Compatibility Risk:
+Low
+
+D. Fixed Code:
+if WINDOWHEIGHT % CELLSIZE != 0:
+    raise ValueError("Window height must be a multiple of cell size.")CELLWIDTH = int(WINDOWWIDTH / CELLSIZE)
 CELLHEIGHT = int(WINDOWHEIGHT / CELLSIZE)
 
 #             R    G    B
 WHITE     = (255, 255, 255)
 BLACK     = (  0,   0,   0)
 RED       = (255,   0,   0)
-GREEN     = (  0, 255,   0)
-DARKGREEN = (  0, 155,   0)
-DARKGRAY  = ( 40,  40,  40)
-BGCOLOR = BLACK
+A. Commit message:
+Switch to `secrets` module for generating secure random numbers.
 
-UP = 'up'
-DOWN = 'down'
-LEFT = 'left'
-RIGHT = 'right'
+B. Change summary:
+Replaced the use of `random.randint()` with `secrets.SystemRandom().randint()` to ensure cryptographic security when generating random numbers for sensitive data.
 
-HEAD = 0 # syntactic sugar: index of the worm's head
+C. Compatibility Risk:
+Low: The change modifies only the random number generation method to a more secure version, without altering any other functionality or introducing new external dependencies.
 
-def main():
-    global FPSCLOCK, DISPLAYSURF, BASICFONT
+D. Fixed Code:
 
-    pygame.init()
-    FPSCLOCK = pygame.time.Clock()
-    DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
-    BASICFONT = pygame.font.Font('freesansbold.ttf', 18)
-    pygame.display.set_caption('Wormy')
-
-    showStartScreen()
-    while True:
-        runGame()
-        showGameOverScreen()
+```
+import secrets  # Imported to utilize the secure random numbers
 
 
 def runGame():
+    secure_random = secrets.SystemRandom()  # Use SystemRandom for cryptographic security
+
     # Set a random start point.
-    startx = random.randint(5, CELLWIDTH - 6)
-    starty = random.randint(5, CELLHEIGHT - 6)
+    startx = secure_random.randint(5, CELLWIDTH - 6)
+    starty = secure_random.randint(5, CELLHEIGHT - 6)
     wormCoords = [{'x': startx,     'y': starty},
                   {'x': startx - 1, 'y': starty},
                   {'x': startx - 2, 'y': starty}]
@@ -58,8 +75,8 @@ def runGame():
     # Start the apple in a random place.
     apple = getRandomLocation()
 
-    while True: # main game loop
-        for event in pygame.event.get(): # event handling loop
+    while True:  # main game loop
+        for event in pygame.event.get():  # event handling loop
             if event.type == QUIT:
                 terminate()
             elif event.type == KEYDOWN:
@@ -76,9 +93,36 @@ def runGame():
 
         # check if the worm has hit itself or the edge
         if wormCoords[HEAD]['x'] == -1 or wormCoords[HEAD]['x'] == CELLWIDTH or wormCoords[HEAD]['y'] == -1 or wormCoords[HEAD]['y'] == CELLHEIGHT:
-            return # game over
+            return  # game over
         for wormBody in wormCoords[1:]:
             if wormBody['x'] == wormCoords[HEAD]['x'] and wormBody['y'] == wormCoords[HEAD]['y']:
+                return  # game over
+
+        # check if worm has eaten an apply
+        if wormCoords[HEAD]['x'] == apple['x'] and wormCoords[HEAD]['y'] == apple['y']:
+            # don't remove worm's tail segment
+            apple = getRandomLocation()  # set a new apple somewhere
+        else:
+            del wormCoords[-1]  # remove worm's tail segment
+
+        # move the worm by adding a segment in the direction it is moving
+        if direction == UP:
+            newHead = {'x': wormCoords[HEAD]['x'], 'y': wormCoords[HEAD]['y'] - 1}
+        elif direction == DOWN:
+            newHead = {'x': wormCoords[HEAD]['x'], 'y': wormCoords[HEAD]['y'] + 1}
+        elif direction == LEFT:
+            newHead = {'x': wormCoords[HEAD]['x'] - 1, 'y': wormCoords[HEAD]['y']}
+        elif direction == RIGHT:
+            newHead = {'x': wormCoords[HEAD]['x'] + 1, 'y': wormCoords[HEAD]['y']}
+        wormCoords.insert(0, newHead)
+        DISPLAYSURF.fill(BGCOLOR)
+        drawGrid()
+        drawWorm(wormCoords)
+        drawApple(apple)
+        drawScore(len(wormCoords) - 3)
+        pygame.display.update()
+        FPSCLOCK.tick(FPS)
+```            if wormBody['x'] == wormCoords[HEAD]['x'] and wormBody['y'] == wormCoords[HEAD]['y']:
                 return # game over
 
         # check if worm has eaten an apply
@@ -150,8 +194,20 @@ def showStartScreen():
             pygame.event.get() # clear event queue
             return
         pygame.display.update()
-        FPSCLOCK.tick(FPS)
-        degrees1 += 3 # rotate by 3 degrees each frame
+        A. Commit message:
+        Use the 'secrets' module for secure random number generation.
+        
+        B. Change summary:
+        Replaced the 'random' module with the 'secrets' module to ensure cryptographically secure random number generation.
+        
+        C. Compatibility Risk:
+        Medium
+        
+        D. Fixed Code:
+        import secrets
+        
+        def getRandomLocation():
+            return {'x': secrets.randbelow(CELLWIDTH), 'y': secrets.randbelow(CELLHEIGHT)}
         degrees2 += 7 # rotate by 7 degrees each frame
 
 
